@@ -1,16 +1,4 @@
-// Временная имитация SDK для демонстрации работы Private Set Intersection (PSI)
-class ArciumMockSDK {
-    async findMatches(inputContact) {
-        console.log("Arcium: Шифруем данные и отправляем в сеть...");
-        // Имитируем задержку сети Arcium
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const mockDatabase = ["+123456789", "test@mail.com", "crypto_friend"];
-        return mockDatabase.includes(inputContact);
-    }
-}
-
-const sdk = new ArciumMockSDK();
+const mockDatabase = ["+123456789", "test@mail.com", "pairon"];
 
 document.getElementById('searchBtn').addEventListener('click', async () => {
     const input = document.getElementById('contactInput').value;
@@ -18,21 +6,28 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     const results = document.getElementById('results');
     const resultsList = document.getElementById('resultsList');
 
-    if (!input) return alert("Введите контакт!");
+    if (!input) return alert("Please enter data first");
 
-    // UX: Показываем процесс загрузки
+    // Эффект загрузки
     btn.disabled = true;
-    btn.innerText = "ENCRYPTING & SEARCHING...";
+    btn.innerText = "ENCRYPTING DATA...";
     results.classList.add('hidden');
 
-    const isFound = await sdk.findMatches(input);
+    // Имитация работы сети Arcium (2 секунды)
+    await new Promise(r => setTimeout(r, 2000));
+    
+    btn.innerText = "RUNNING PSI PROTOCOL...";
+    await new Promise(r => setTimeout(r, 1500));
 
-    // Показываем результат
+    // Проверка
+    const isFound = mockDatabase.includes(input.toLowerCase());
+
     btn.disabled = false;
-    btn.innerText = "FIND MATCHES";
+    btn.innerText = "INITIATE PRIVATE DISCOVERY";
     results.classList.remove('hidden');
+    results.classList.remove('animate-pulse');
     
     resultsList.innerHTML = isFound 
-        ? `<div class="text-green-400 p-2">✓ Match found! This user is on Arcium.</div>`
-        : `<div class="text-zinc-500 p-2">No matches found safely.</div>`;
+        ? `<span class="text-green-400 font-bold tracking-widest uppercase text-[10px]">✓ Match found in Arcium Cluster</span>`
+        : `<span class="text-zinc-500 font-bold tracking-widest uppercase text-[10px]">No private matches detected</span>`;
 });
