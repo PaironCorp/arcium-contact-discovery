@@ -1,15 +1,1 @@
-{
-  "name": "arcium-contact-discovery",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@solana/web3.js": "latest",
-    "vite": "latest"
-  }
-}
+{}
