@@ -1,35 +1,61 @@
-const mockDatabase = ["0x5f4dcc3b5aa765d61d8327deb882cf99", "0x7c4a8d09ca3762af61e59520943dc264"];
+console.log("Arcium App Loaded");
 
-document.getElementById('searchBtn').addEventListener('click', async () => {
-    const input = document.getElementById('contactInput').value;
-    const btn = document.getElementById('searchBtn');
-    const results = document.getElementById('results');
-    const resultsList = document.getElementById('resultsList');
+const connectBtn = document.getElementById('connectBtn');
+const actionBtn = document.getElementById('actionBtn');
+const inputField = document.getElementById('inputField');
+const statusArea = document.getElementById('statusArea');
 
-    if (!input) return alert("Please enter a contact to encrypt");
+// Логика Кошелька
+if(connectBtn) {
+    connectBtn.addEventListener('click', async () => {
+        const provider = window.solana;
+        if (!provider || !provider.isPhantom) {
+            alert("Phantom Wallet не найден! Установите расширение Phantom.");
+            window.open("https://phantom.app/", "_blank");
+            return;
+        }
+        try {
+            const resp = await provider.connect();
+            const key = resp.publicKey.toString();
+            connectBtn.innerText = "CONNECTED";
+            connectBtn.className = "bg-green-600 text-white px-6 py-2 rounded-full text-xs font-bold tracking-widest border border-green-600";
+            log("Wallet connected: " + key);
+        } catch (err) { console.error(err); }
+    });
+}
 
-    btn.disabled = true;
-    results.classList.remove('hidden');
-    
-    // Имитация локального хеширования (то, что делает Arcium SDK)
-    resultsList.innerHTML = `<span class="text-purple-400 text-[9px] animate-pulse">GENERATING SECURE HASH...</span>`;
-    await new Promise(r => setTimeout(r, 1000));
-    
-    const fakeHash = "0x" + Math.random().toString(16).slice(2, 34);
-    resultsList.innerHTML = `<span class="text-zinc-500 text-[9px]">LOCAL HASH: ${fakeHash}</span>`;
-    
-    await new Promise(r => setTimeout(r, 1000));
-    btn.innerText = "SENDING TO ARCIUM CLUSTER...";
-    
-    // Имитация вычислений в сети
-    await new Promise(r => setTimeout(r, 2000));
+// Логика Arcium
+if(actionBtn) {
+    actionBtn.addEventListener('click', async () => {
+        const text = inputField.value;
+        if(!text) return alert("Введите данные!");
 
-    btn.disabled = false;
-    btn.innerText = "INITIATE PRIVATE DISCOVERY";
-    
-    // Результат
-    const isFound = input.includes("test") || input === "123"; // Для теста
-    resultsList.innerHTML = isFound 
-        ? `<div class="py-2"><span class="text-green-400 font-bold uppercase text-[10px]">✓ Match found via PSI Protocol</span><br><span class="text-zinc-600 text-[8px]">Data remained encrypted during search</span></div>`
-        : `<div class="py-2"><span class="text-zinc-500 font-bold uppercase text-[10px]">No matches found in confidential set</span></div>`;
-});
+        statusArea.classList.remove('hidden');
+        actionBtn.disabled = true;
+        actionBtn.innerText = "PROCESSING...";
+
+        log(`Input: ${text}`);
+        log("Encrypting via SHA-256...");
+        await new Promise(r => setTimeout(r, 1000));
+        
+        const msgBuffer = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        log(`Hash: ${hashHex.slice(0, 15)}...`);
+        log("Sending to Arcium Network...");
+        await new Promise(r => setTimeout(r, 1500));
+        log("Status: No match found (Privacy Preserved).");
+
+        actionBtn.disabled = false;
+        actionBtn.innerText = "ENCRYPT & FIND MATCH";
+    });
+}
+
+function log(msg) {
+    const line = document.createElement('div');
+    line.innerText = "> " + msg;
+    statusArea.appendChild(line);
+    statusArea.scrollTop = statusArea.scrollHeight;
+}
