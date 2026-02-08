@@ -5,11 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@arcium/sdk": "latest",
     "@solana/web3.js": "latest",
     "vite": "latest"
   }
