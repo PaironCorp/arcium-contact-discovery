@@ -6,38 +6,97 @@
     <title>Arcium | Private Contact Discovery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000000; color: #ffffff; font-family: sans-serif; }
+        body { background-color: #03000a; color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        /* --- ФОНОВАЯ АНИМАЦИЯ ДАННЫХ (Голубые пакеты) --- */
+        .tech-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .data-packet {
+            position: absolute; width: 4px; height: 4px; background: #3b82f6; border-radius: 50%;
+            box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6; opacity: 0;
+            animation: dataFlow 20s linear infinite;
+        }
+        @keyframes dataFlow {
+            0% { transform: translate(-10vw, -10vh); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translate(110vw, 110vh); opacity: 0; }
+        }
+        /* Разные задержки для пакетов, чтобы они летели хаотично */
+        .p1 { top: 10%; left: -5%; animation-delay: 0s; animation-duration: 25s; }
+        .p2 { top: 30%; left: -5%; animation-delay: 5s; animation-duration: 18s; }
+        .p3 { top: 60%; left: -5%; animation-delay: 2s; animation-duration: 30s; }
+        .p4 { top: 85%; left: -5%; animation-delay: 8s; animation-duration: 22s; }
+        .p5 { top: -5%; left: 40%; animation-delay: 12s; animation-duration: 20s; }
+
+        /* Анимация появления ассистента */
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .assistant-enter { animation: floatIn 0.8s ease-out forwards; animation-delay: 1s; opacity: 0; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 relative">
 
-    <nav class="absolute top-5 right-5">
-        <button id="connectBtn" class="border border-purple-600 text-purple-400 hover:bg-purple-900 px-6 py-2 rounded-full text-xs font-bold tracking-widest transition-all uppercase">
+    <div class="tech-bg">
+        <div class="data-packet p1"></div>
+        <div class="data-packet p2"></div>
+        <div class="data-packet p3"></div>
+        <div class="data-packet p4"></div>
+        <div class="data-packet p5"></div>
+    </div>
+
+    <nav class="absolute top-5 right-5 z-10">
+        <button id="connectBtn" class="border border-purple-600/50 text-purple-400 hover:bg-purple-900/30 hover:border-purple-500 px-6 py-2 rounded-full text-xs font-bold tracking-widest transition-all uppercase backdrop-blur-md">
             Connect Phantom
         </button>
     </nav>
 
-    <main class="max-w-md w-full bg-zinc-900/50 border border-zinc-800 p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+    <main class="max-w-md w-full bg-zinc-900/40 border border-purple-900/30 p-8 rounded-2xl shadow-[0_0_50px_rgba(109,69,255,0.1)] backdrop-blur-xl z-10 relative">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-black italic tracking-tighter text-white mb-2">ARCIUM</h1>
-            <p class="text-[10px] text-zinc-500 uppercase tracking-[0.4em]">Confidential Layer</p>
+            <h1 class="text-4xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-400 mb-2">ARCIUM</h1>
+            <p class="text-[10px] text-purple-400/70 uppercase tracking-[0.4em]">Confidential Layer</p>
         </header>
 
         <div class="space-y-6">
             <div>
                 <label class="block text-[9px] text-zinc-500 mb-2 uppercase tracking-widest">Target Data</label>
                 <input type="text" id="inputField" placeholder="Enter email or phone..." 
-                       class="w-full bg-black border border-zinc-700 p-3 rounded text-white focus:border-purple-500 outline-none transition-colors">
+                       class="w-full bg-black/50 border border-zinc-800 p-3 rounded text-white focus:border-purple-500 outline-none transition-colors font-mono text-sm">
             </div>
 
-            <button id="actionBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-bold text-xs tracking-[0.2em] transition-all">
+            <button id="actionBtn" class="w-full bg-gradient-to-r from-purple-700 to-purple-600 hover:from-purple-600 hover:to-purple-500 text-white py-4 rounded-xl font-bold text-xs tracking-[0.2em] transition-all shadow-lg shadow-purple-900/20">
                 ENCRYPT & FIND MATCH
             </button>
         </div>
 
-        <div id="statusArea" class="mt-6 p-4 bg-black rounded border border-zinc-900 h-32 overflow-y-auto font-mono text-[10px] text-zinc-400 hidden">
+        <div id="statusArea" class="mt-6 p-4 bg-black/60 rounded border border-zinc-900/80 h-32 overflow-y-auto font-mono text-[10px] text-purple-300/80 hidden">
         </div>
     </main>
+
+    <div class="fixed bottom-6 right-6 z-20 flex flex-col items-end assistant-enter">
+        <div class="mb-3 bg-zinc-900/80 backdrop-blur-md border border-blue-500/30 p-4 rounded-2xl rounded-br-sm max-w-[280px] text-xs text-zinc-300 shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+            <h3 class="text-blue-400 font-bold mb-1 uppercase tracking-wider flex items-center">
+                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+                Arcium Guide
+            </h3>
+            <p class="leading-relaxed">
+                Finding friends usually requires uploading your entire address book. 
+                <span class="text-white font-semibold">Arcium changes this.</span>
+            </p>
+            <p class="mt-2 leading-relaxed border-t border-white/10 pt-2">
+                We use <span class="text-blue-400 font-semibold">Private Set Intersection (PSI)</span>. It reveals only matches while non-matches remain hidden—frictionless onboarding without data leaks.
+            </p>
+        </div>
+        <img src="./avatar.png" alt="AI Assistant" 
+             class="w-14 h-14 rounded-full border-2 border-blue-400/50 shadow-[0_0_20px_rgba(59,130,246,0.3)] opacity-90 hover:opacity-100 transition-all hover:scale-105">
+    </div>
 
     <script type="module" src="./main.js"></script>
 </body>
